@@ -53,9 +53,9 @@ const Footer = () => {
                 <Mail size={18} />
                 <span>mydigitalkulture@gmail.com</span>
               </a>
-              <a href="tel:+919594659148" className="flex items-center space-x-3 text-[rgb(218,218,218)] hover:text-[rgb(218,255,1)] transition-colors">
+              <a href="tel:+919833581238" className="flex items-center space-x-3 text-[rgb(218,218,218)] hover:text-[rgb(218,255,1)] transition-colors">
                 <Phone size={18} />
-                <span>+919594659148</span>
+                <span>+919833581238</span>
               </a>
             </div>
 
