@@ -32,7 +32,7 @@ const Footer = () => {
     { icon: Instagram, href: '#', label: 'Instagram' },
     { icon: Linkedin, href: '#', label: 'LinkedIn' },
     { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Mail, href: 'mailto:hello@mustache-media.com', label: 'Email' }
+    { icon: Mail, href: 'mailto:mydigitalkulture@gmail.com', label: 'Email' }
   ];
 
   return (
@@ -49,13 +49,13 @@ const Footer = () => {
             
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <a href="mailto:hello@mustache-media.com" className="flex items-center space-x-3 text-[rgb(218,218,218)] hover:text-[rgb(218,255,1)] transition-colors">
+              <a href="mailto:mydigitalkulture@gmail.com" className="flex items-center space-x-3 text-[rgb(218,218,218)] hover:text-[rgb(218,255,1)] transition-colors">
                 <Mail size={18} />
-                <span>hello@mustache-media.com</span>
+                <span>mydigitalkulture@gmail.com</span>
               </a>
-              <a href="tel:+1234567890" className="flex items-center space-x-3 text-[rgb(218,218,218)] hover:text-[rgb(218,255,1)] transition-colors">
+              <a href="tel:+919594659148" className="flex items-center space-x-3 text-[rgb(218,218,218)] hover:text-[rgb(218,255,1)] transition-colors">
                 <Phone size={18} />
-                <span>+1 (234) 567-890</span>
+                <span>+919594659148</span>
               </a>
             </div>
 
