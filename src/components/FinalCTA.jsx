@@ -9,16 +9,39 @@ const FinalCTA = () => {
     company: '',
     revenue: ''
   });
+  const [result, setResult] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Mock form submission
-    if (formData.name && formData.email) {
-      toast.success('Strategy call request submitted! We\'ll contact you within 24 hours.');
-      setFormData({ name: '', email: '', company: '', revenue: '' });
-    } else {
-      toast.error('Please fill in your name and email');
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setResult('');
+
+    const data = new FormData(event.target);
+    data.append("access_key", "21003b6c-102b-47ae-9d90-bea371b6a2d7");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: data
+      });
+
+      const json = await response.json();
+
+      if (json.success) {
+        setResult("Success!");
+        toast.success("Strategy call request submitted! We'll contact you within 24 hours.");
+        setFormData({ name: '', email: '', company: '', revenue: '' });
+        event.target.reset();
+      } else {
+        setResult("Error");
+        toast.error(json.message || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      setResult("Error");
+      toast.error("Network error. Please check your connection and try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -92,6 +115,9 @@ const FinalCTA = () => {
             {/* Form */}
             <div className="bg-[rgb(17,17,19)] border border-[rgb(218,255,1)] rounded-2xl p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Hidden honeypot field for spam protection */}
+                <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
+
                 <div>
                   <label className="block text-sm font-medium text-[rgb(218,218,218)] mb-2">
                     Full Name *
@@ -154,11 +180,23 @@ const FinalCTA = () => {
                   </select>
                 </div>
 
-                <button type="submit" className="btn-primary w-full flex items-center justify-center space-x-2 group">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-primary w-full flex items-center justify-center space-x-2 group disabled:opacity-60 disabled:cursor-not-allowed"
+                >
                   <Calendar size={20} />
-                  <span>Book Your Strategy Call</span>
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  <span>{isSubmitting ? 'Submitting...' : 'Book Your Strategy Call'}</span>
+                  {!isSubmitting && (
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  )}
                 </button>
+
+                {result && (
+                  <p className={`text-sm text-center font-medium ${result === 'Success!' ? 'text-[rgb(218,255,1)]' : 'text-red-400'}`}>
+                    {result === 'Success!' ? '✓ Submission successful!' : '✗ Submission failed. Please try again.'}
+                  </p>
+                )}
 
                 <p className="text-xs text-center text-[rgb(161,161,170)]">
                   We respect your privacy. Your information is safe with us.
