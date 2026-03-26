@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Calendar, ArrowRight, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import TextAnimation from './ui/scroll-text';
 
 const FinalCTA = () => {
   const [formData, setFormData] = useState({
@@ -60,11 +62,11 @@ const FinalCTA = () => {
   ];
 
   return (
-    <section id="contact" className="py-24 bg-[rgb(26,28,30)] relative overflow-hidden">
+    <section id="contact" className="py-24 bg-[var(--bg-primary)]">
       {/* Background Accents */}
       <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-[rgba(218,255,1,0.05)] to-transparent"></div>
       <div className="absolute bottom-0 right-0 w-1/3 h-full bg-gradient-to-l from-[rgba(218,255,1,0.05)] to-transparent"></div>
-      
+
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto">
           {/* Urgency Badge */}
@@ -76,18 +78,23 @@ const FinalCTA = () => {
           </div>
 
           <div className="text-center mb-12">
-            <h2 className="display-md text-white mb-4">
-              Ready to <span className="text-[rgb(218,255,1)]">10x Your Growth?</span>
-            </h2>
-            <p className="body-lg text-[rgb(218,218,218)] max-w-2xl mx-auto">
+            <TextAnimation as="h2" classname="display-md text-[var(--text-primary)] mb-4" direction="up">
+              Ready to <span className="text-[var(--accent-primary)]">10x Your Growth?</span>
+            </TextAnimation>
+            <TextAnimation as="p" classname="body-lg text-[var(--text-secondary)] max-w-2xl mx-auto" direction="up">
               Book a free strategy call and discover how AI-powered marketing can transform your business
-            </p>
+            </TextAnimation>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Benefits */}
-            <div className="space-y-6">
-              <h3 className="h2 text-white mb-6">What You'll Get:</h3>
+            <motion.div
+              initial={{ opacity: 0, x: -50, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              viewport={{ once: true, margin: '-10%' }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className="space-y-6"
+            >
+              <h3 className="h2 text-[var(--text-primary)] mb-6">What You'll Get:</h3>
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-start space-x-4">
                   <div className="w-6 h-6 bg-[rgb(218,255,1)] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
@@ -98,22 +105,28 @@ const FinalCTA = () => {
               ))}
 
               {/* Trust Signals */}
-              <div className="mt-12 pt-8 border-t border-[rgba(255,255,255,0.1)]">
+              <div className="mt-12 pt-8 border-t border-[var(--border-subtle)]">
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <div className="text-3xl font-bold text-[rgb(218,255,1)] mb-2">48hrs</div>
+                    <div className="text-3xl font-bold text-[var(--accent-primary)] mb-2">48hrs</div>
                     <div className="text-sm text-[rgb(161,161,170)]">Response Time</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-[rgb(218,255,1)] mb-2">100%</div>
+                    <div className="text-3xl font-bold text-[var(--accent-primary)] mb-2">100%</div>
                     <div className="text-sm text-[rgb(161,161,170)]">Free Consultation</div>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Form */}
-            <div className="bg-[rgb(17,17,19)] border border-[rgb(218,255,1)] rounded-2xl p-8">
+            <motion.div
+              initial={{ opacity: 0, x: 50, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              viewport={{ once: true, margin: '-10%' }}
+              transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
+              className="bg-[var(--bg-primary)] border border-[var(--accent-primary)] rounded-2xl p-8"
+            >
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Hidden honeypot field for spam protection */}
                 <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
@@ -193,7 +206,7 @@ const FinalCTA = () => {
                 </button>
 
                 {result && (
-                  <p className={`text-sm text-center font-medium ${result === 'Success!' ? 'text-[rgb(218,255,1)]' : 'text-red-400'}`}>
+                  <p className={`text-sm text-center font-medium ${result === 'Success!' ? 'text-[var(--accent-primary)]' : 'text-red-400'}`}>
                     {result === 'Success!' ? '✓ Submission successful!' : '✗ Submission failed. Please try again.'}
                   </p>
                 )}
@@ -202,7 +215,7 @@ const FinalCTA = () => {
                   We respect your privacy. Your information is safe with us.
                 </p>
               </form>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

@@ -1,24 +1,26 @@
-/* Dark Theme Foundation - Neon Green Kit */
 :root {
-  /* Dark Theme Base */
-  --bg-primary: rgb(17, 17, 19);
-  --bg-secondary: rgb(26, 28, 30);
-  --bg-tertiary: rgb(38, 40, 42);
+  /* Dark Cyber Base */
+  --bg-primary: #070d1f; 
+  --bg-secondary: #0c1326; 
+  --bg-tertiary: #1c253e; 
   
   /* Text Hierarchy */
-  --text-primary: rgb(255, 255, 255);
-  --text-secondary: rgb(230, 230, 230);
-  --text-muted: rgb(180, 180, 190);
+  --text-primary: #ffffff; 
+  --text-secondary: #a5aac2; 
+  --text-muted: #4a5167; 
   
   /* Border System */
-  --border-primary: rgb(63, 63, 63);
-  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-primary: rgba(18, 216, 250, 0.4);
+  --border-subtle: rgba(18, 216, 250, 0.15);
   
-  /* Neon Green Accent */
-  --accent-primary: rgb(218, 255, 1);
-  --accent-hover: rgb(166, 190, 21);
-  --accent-pressed: rgb(134, 155, 16);
-  --accent-bg: rgba(218, 255, 1, 0.1);
+  /* Cyan/Green Accent */
+  --accent-cyan: #12D8FA;
+  --accent-blue: #1FA2FF;
+  --accent-green: #A6FFCB;
+  --accent-primary: #12D8FA;
+  --accent-hover: #0ba9c4;
+  --accent-pressed: #08879e;
+  --accent-bg: rgba(18, 216, 250, 0.1);
 }
 
 * {
