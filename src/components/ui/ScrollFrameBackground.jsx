@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 
 // Preload frames eagerly on mount for smooth scrubbing
 const TOTAL_FRAMES = 208;
-const FRAME_PREFIX = '/src/assests/anime/ezgif-frame-';
+const FRAME_PREFIX = '/anime/ezgif-frame-';
 
 function pad(n) {
   return String(n).padStart(3, '0');
