@@ -5,6 +5,8 @@ const FRAMESET_FOLDER ='newanime';
 const FRAME_PREFIX = `/${FRAMESET_FOLDER}/ezgif-frame-`;
 const PRELOAD_AHEAD = 4;
 const FRAMESET_VERSION = import.meta.env.VITE_FRAMESET_VERSION || '2026-03-30-v2';
+const SINGLE_IMAGE_MODE = import.meta.env.PROD || import.meta.env.VITE_SCROLL_BG_SINGLE_IMAGE === 'true';
+const STATIC_FRAME_INDEX = Number.parseInt(import.meta.env.VITE_SCROLL_BG_STATIC_FRAME || '0', 10);
 
 function pad(n) {
   return String(n).padStart(3, '0');
@@ -127,24 +129,38 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
   }, [drawFrame, ensureFrame]);
 
   useEffect(() => {
-    ensureFrame(0, true);
-    for (let i = 1; i <= PRELOAD_AHEAD; i++) {
-      ensureFrame(i);
+    const staticFrame = Number.isFinite(STATIC_FRAME_INDEX)
+      ? Math.max(0, Math.min(TOTAL_FRAMES - 1, STATIC_FRAME_INDEX))
+      : 0;
+
+    currentFrameRef.current = SINGLE_IMAGE_MODE ? staticFrame : 0;
+
+    ensureFrame(currentFrameRef.current, true);
+    if (!SINGLE_IMAGE_MODE) {
+      for (let i = 1; i <= PRELOAD_AHEAD; i++) {
+        ensureFrame(i);
+      }
     }
 
     resize();
-    updateBounds();
+    if (!SINGLE_IMAGE_MODE) {
+      updateBounds();
+    }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', resize);
-    window.addEventListener('resize', updateBounds);
+    if (!SINGLE_IMAGE_MODE) {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', updateBounds);
+    }
 
-    drawFrame(0);
+    drawFrame(currentFrameRef.current);
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', resize);
-      window.removeEventListener('resize', updateBounds);
+      if (!SINGLE_IMAGE_MODE) {
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', updateBounds);
+      }
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       framesRef.current.clear();
     };
