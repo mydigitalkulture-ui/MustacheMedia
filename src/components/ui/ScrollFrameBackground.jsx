@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 const TOTAL_FRAMES = 208;
 const FRAME_PREFIX = '/anime/ezgif-frame-';
 const PRELOAD_AHEAD = 4;
+const FRAMESET_VERSION = import.meta.env.VITE_FRAMESET_VERSION || '2026-03-30';
 
 function pad(n) {
   return String(n).padStart(3, '0');
@@ -16,7 +17,10 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
   const startYRef = useRef(0);
   const endYRef = useRef(0);
 
-  const getFrameSrc = useCallback((index) => `${FRAME_PREFIX}${pad(index + 1)}.jpg`, []);
+  const getFrameSrc = useCallback(
+    (index) => `${FRAME_PREFIX}${pad(index + 1)}.jpg?v=${encodeURIComponent(FRAMESET_VERSION)}`,
+    []
+  );
 
   const ensureFrame = useCallback(
     (index, drawWhenLoaded = false) => {
