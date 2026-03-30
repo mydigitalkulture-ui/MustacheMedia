@@ -155,11 +155,31 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
 
     drawFrame(currentFrameRef.current);
 
+    let boundsRetryId;
+    if (!SINGLE_IMAGE_MODE) {
+      let tries = 0;
+      const retryUntilSectionsReady = () => {
+        updateBounds();
+        onScroll();
+
+        const hasValidBounds = endYRef.current > startYRef.current;
+        if (!hasValidBounds && tries < 24) {
+          tries += 1;
+          boundsRetryId = window.setTimeout(retryUntilSectionsReady, 120);
+        }
+      };
+
+      retryUntilSectionsReady();
+    }
+
     return () => {
       window.removeEventListener('resize', resize);
       if (!SINGLE_IMAGE_MODE) {
         window.removeEventListener('scroll', onScroll);
         window.removeEventListener('resize', updateBounds);
+      }
+      if (typeof boundsRetryId === 'number') {
+        window.clearTimeout(boundsRetryId);
       }
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       framesRef.current.clear();

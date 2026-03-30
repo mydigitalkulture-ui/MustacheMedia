@@ -18,7 +18,6 @@ const Home = () => {
 
   useEffect(() => {
     const canUseBackgroundFrames =
-      window.matchMedia('(min-width: 1024px)').matches &&
       !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     setEnableBackgroundFrames(canUseBackgroundFrames);
