@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 
-const TOTAL_FRAMES = 208;
-const FRAME_PREFIX = '/anime/ezgif-frame-';
+const TOTAL_FRAMES = 240;
+const FRAMESET_FOLDER ='newanime';
+const FRAME_PREFIX = `/${FRAMESET_FOLDER}/ezgif-frame-`;
 const PRELOAD_AHEAD = 4;
-const FRAMESET_VERSION = import.meta.env.VITE_FRAMESET_VERSION || '2026-03-30';
+const FRAMESET_VERSION = import.meta.env.VITE_FRAMESET_VERSION || '2026-03-30-v2';
 
 function pad(n) {
   return String(n).padStart(3, '0');
