@@ -5,7 +5,7 @@ const FRAMESET_FOLDER ='newanime';
 const FRAME_PREFIX = `/${FRAMESET_FOLDER}/ezgif-frame-`;
 const PRELOAD_AHEAD = 4;
 const FRAMESET_VERSION = import.meta.env.VITE_FRAMESET_VERSION || '2026-03-30-v2';
-const SINGLE_IMAGE_MODE = import.meta.env.PROD || import.meta.env.VITE_SCROLL_BG_SINGLE_IMAGE === 'true';
+const SINGLE_IMAGE_MODE = import.meta.env.VITE_SCROLL_BG_SINGLE_IMAGE === 'true';
 const STATIC_FRAME_INDEX = Number.parseInt(import.meta.env.VITE_SCROLL_BG_STATIC_FRAME || '0', 10);
 
 function pad(n) {
