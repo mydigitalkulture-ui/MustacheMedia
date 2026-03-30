@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
-import { motion } from 'framer-motion';
 import image from './hero_logo.png';
 
 const navItems = [
@@ -78,11 +77,7 @@ const Header = () => {
                 style={{ transformStyle: "preserve-3d" }}
               >
                 {activeTab === item.id && (
-                  <motion.div
-                    layoutId="header-active-tab-desktop"
-                    transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
-                    className="absolute inset-0 bg-[var(--accent-bg)] rounded-full -z-10"
-                  />
+                  <span className="absolute inset-0 bg-[var(--accent-bg)] rounded-full -z-10 transition-all duration-300" />
                 )}
                 <span className={`relative z-10 ${activeTab === item.id ? 'text-[var(--accent-primary)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors'}`}>
                   {item.label}
@@ -115,11 +110,7 @@ const Header = () => {
                 className="relative px-4 py-3 rounded-xl font-medium w-full text-left"
               >
                 {activeTab === item.id && (
-                  <motion.div
-                    layoutId="header-active-tab-mobile"
-                    transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
-                    className="absolute inset-0 bg-[var(--accent-bg)] rounded-xl -z-10"
-                  />
+                  <span className="absolute inset-0 bg-[var(--accent-bg)] rounded-xl -z-10 transition-all duration-300" />
                 )}
                 <span className={`relative z-10 ${activeTab === item.id ? 'text-[var(--accent-primary)]' : 'text-[var(--text-secondary)]'}`}>
                   {item.label}

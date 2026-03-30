@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { ArrowRight, Calendar, TrendingUp, BarChart, Network } from 'lucide-react';
-import Cubes from './Cubes';
+
+const Cubes = lazy(() => import('./Cubes'));
 
 const HeroSection = () => {
+  const [showHeroCubes, setShowHeroCubes] = useState(false);
+
+  useEffect(() => {
+    const shouldEnable =
+      window.matchMedia('(min-width: 1024px)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!shouldEnable) return;
+
+    const timerId = window.setTimeout(() => {
+      setShowHeroCubes(true);
+    }, 450);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, []);
+
   const handlePrimaryCTA = () => {
     const strategySection = document.getElementById('strategy');
     if (strategySection) {
@@ -13,14 +32,17 @@ const HeroSection = () => {
   return (
     <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[var(--bg-primary)] pt-32 pb-20">
 
-      {/* Background Animated Cubes mapped to new theme */}
-      <Cubes
-        fullScreen={true}
-        gridSize={12}
-        rippleColor="rgba(18, 216, 250, 0.3)"
-        faceColor="rgba(12, 19, 38, 0.4)"
-        borderStyle="1px solid rgba(18, 216, 250, 0.15)"
-      />
+      {showHeroCubes ? (
+        <Suspense fallback={null}>
+          <Cubes
+            fullScreen={true}
+            gridSize={12}
+            rippleColor="rgba(18, 216, 250, 0.3)"
+            faceColor="rgba(12, 19, 38, 0.4)"
+            borderStyle="1px solid rgba(18, 216, 250, 0.15)"
+          />
+        </Suspense>
+      ) : null}
 
       <div className="container mx-auto px-6 relative z-10 flex flex-col items-center text-center mt-10">
 

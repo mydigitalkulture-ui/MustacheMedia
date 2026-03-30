@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 
-// Preload frames eagerly on mount for smooth scrubbing
 const TOTAL_FRAMES = 208;
 const FRAME_PREFIX = '/anime/ezgif-frame-';
+const PRELOAD_AHEAD = 4;
 
 function pad(n) {
   return String(n).padStart(3, '0');
@@ -10,30 +10,80 @@ function pad(n) {
 
 const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelector = '#contact' }) => {
   const canvasRef = useRef(null);
-  const framesRef = useRef([]);
-  const loadedRef = useRef(0);
+  const framesRef = useRef(new Map());
   const currentFrameRef = useRef(0);
   const rafRef = useRef(null);
   const startYRef = useRef(0);
   const endYRef = useRef(0);
 
-  // Draw a single frame to the canvas
+  const getFrameSrc = useCallback((index) => `${FRAME_PREFIX}${pad(index + 1)}.jpg`, []);
+
+  const ensureFrame = useCallback(
+    (index, drawWhenLoaded = false) => {
+      const safeIndex = Math.max(0, Math.min(TOTAL_FRAMES - 1, index));
+      const cached = framesRef.current.get(safeIndex);
+      if (cached) {
+        if (drawWhenLoaded && cached.complete) {
+          const canvas = canvasRef.current;
+          if (!canvas) return cached;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return cached;
+          const scale = Math.max(canvas.width / cached.naturalWidth, canvas.height / cached.naturalHeight);
+          const w = cached.naturalWidth * scale;
+          const h = cached.naturalHeight * scale;
+          const x = (canvas.width - w) / 2;
+          const y = (canvas.height - h) / 2;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(cached, x, y, w, h);
+        }
+        return cached;
+      }
+
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = getFrameSrc(safeIndex);
+      if (drawWhenLoaded) {
+        img.onload = () => {
+          if (safeIndex === currentFrameRef.current) {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            const scale = Math.max(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+            const w = img.naturalWidth * scale;
+            const h = img.naturalHeight * scale;
+            const x = (canvas.width - w) / 2;
+            const y = (canvas.height - h) / 2;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, x, y, w, h);
+          }
+        };
+      }
+
+      framesRef.current.set(safeIndex, img);
+      return img;
+    },
+    [getFrameSrc]
+  );
+
   const drawFrame = useCallback((index) => {
     const canvas = canvasRef.current;
-    const img = framesRef.current[index];
-    if (!canvas || !img || !img.complete) return;
+    if (!canvas) return;
+
+    const img = ensureFrame(index, true);
+    if (!img || !img.complete) return;
+
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Cover-fit the image
     const scale = Math.max(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
     const w = img.naturalWidth * scale;
     const h = img.naturalHeight * scale;
     const x = (canvas.width - w) / 2;
     const y = (canvas.height - h) / 2;
     ctx.drawImage(img, x, y, w, h);
-  }, []);
+  }, [ensureFrame]);
 
-  // Resize canvas to match window
   const resize = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -42,7 +92,6 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
     drawFrame(currentFrameRef.current);
   }, [drawFrame]);
 
-  // Recompute section bounds
   const updateBounds = useCallback(() => {
     const startEl = document.querySelector(startSelector);
     const endEl = document.querySelector(endSelector);
@@ -50,13 +99,13 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
     if (endEl) endYRef.current = endEl.getBoundingClientRect().bottom + window.scrollY;
   }, [startSelector, endSelector]);
 
-  // Scroll handler: map scroll → frame index
   const onScroll = useCallback(() => {
     const scrollY = window.scrollY;
     const start = startYRef.current;
     const end = endYRef.current;
 
-    // Only animate between start and end sections
+    if (end <= start) return;
+
     if (scrollY < start || scrollY > end) return;
 
     const progress = Math.min(1, Math.max(0, (scrollY - start) / (end - start)));
@@ -64,22 +113,18 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
 
     if (frameIndex !== currentFrameRef.current) {
       currentFrameRef.current = frameIndex;
+      for (let i = 1; i <= PRELOAD_AHEAD; i++) {
+        ensureFrame(frameIndex + i);
+      }
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => drawFrame(frameIndex));
     }
-  }, [drawFrame]);
+  }, [drawFrame, ensureFrame]);
 
   useEffect(() => {
-    // Load all frames
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
-      const img = new Image();
-      img.src = `${FRAME_PREFIX}${pad(i)}.jpg`;
-      img.onload = () => {
-        loadedRef.current++;
-        // Draw first frame once at least a few are ready
-        if (loadedRef.current === 1) drawFrame(0);
-      };
-      framesRef.current[i - 1] = img;
+    ensureFrame(0, true);
+    for (let i = 1; i <= PRELOAD_AHEAD; i++) {
+      ensureFrame(i);
     }
 
     resize();
@@ -87,10 +132,8 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', resize);
-    // Recompute bounds on resize (sections may shift)
     window.addEventListener('resize', updateBounds);
 
-    // Draw initial frame
     drawFrame(0);
 
     return () => {
@@ -98,8 +141,9 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
       window.removeEventListener('resize', resize);
       window.removeEventListener('resize', updateBounds);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      framesRef.current.clear();
     };
-  }, [onScroll, resize, updateBounds, drawFrame]);
+  }, [onScroll, resize, updateBounds, drawFrame, ensureFrame]);
 
   return (
     <div
