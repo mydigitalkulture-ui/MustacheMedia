@@ -3,7 +3,9 @@ import React, { useEffect, useRef, useCallback } from 'react';
 const TOTAL_FRAMES = 240;
 const FRAMESET_FOLDER ='newanime';
 const FRAME_PREFIX = `/${FRAMESET_FOLDER}/ezgif-frame-`;
-const PRELOAD_AHEAD = 4;
+const PRELOAD_AHEAD = 10;
+const PRELOAD_BEHIND = 4;
+const MAX_FALLBACK_DISTANCE = 20;
 const FRAMESET_VERSION = import.meta.env.VITE_FRAMESET_VERSION || '2026-03-30-v2';
 const SINGLE_IMAGE_MODE = import.meta.env.VITE_SCROLL_BG_SINGLE_IMAGE === 'true';
 const STATIC_FRAME_INDEX = Number.parseInt(import.meta.env.VITE_SCROLL_BG_STATIC_FRAME || '0', 10);
@@ -19,6 +21,21 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
   const rafRef = useRef(null);
   const startYRef = useRef(0);
   const endYRef = useRef(0);
+
+  const drawImageToCanvas = useCallback((img) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !img || !img.complete) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const scale = Math.max(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+    const w = img.naturalWidth * scale;
+    const h = img.naturalHeight * scale;
+    const x = (canvas.width - w) / 2;
+    const y = (canvas.height - h) / 2;
+    ctx.drawImage(img, x, y, w, h);
+  }, []);
 
   const getFrameSrc = useCallback(
     (index) => `${FRAME_PREFIX}${pad(index + 1)}.jpg?v=${encodeURIComponent(FRAMESET_VERSION)}`,
@@ -48,21 +65,12 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
 
       const img = new Image();
       img.decoding = 'async';
+      img.fetchPriority = safeIndex < 3 ? 'high' : 'low';
       img.src = getFrameSrc(safeIndex);
       if (drawWhenLoaded) {
         img.onload = () => {
           if (safeIndex === currentFrameRef.current) {
-            const canvas = canvasRef.current;
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-            const scale = Math.max(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
-            const w = img.naturalWidth * scale;
-            const h = img.naturalHeight * scale;
-            const x = (canvas.width - w) / 2;
-            const y = (canvas.height - h) / 2;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, x, y, w, h);
+            drawImageToCanvas(img);
           }
         };
       }
@@ -70,26 +78,49 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
       framesRef.current.set(safeIndex, img);
       return img;
     },
-    [getFrameSrc]
+    [drawImageToCanvas, getFrameSrc]
   );
 
   const drawFrame = useCallback((index) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
     const img = ensureFrame(index, true);
     if (!img || !img.complete) return;
+    drawImageToCanvas(img);
+  }, [drawImageToCanvas, ensureFrame]);
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const scale = Math.max(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
-    const w = img.naturalWidth * scale;
-    const h = img.naturalHeight * scale;
-    const x = (canvas.width - w) / 2;
-    const y = (canvas.height - h) / 2;
-    ctx.drawImage(img, x, y, w, h);
+  const prefetchNearbyFrames = useCallback((index) => {
+    for (let i = -PRELOAD_BEHIND; i <= PRELOAD_AHEAD; i++) {
+      ensureFrame(index + i);
+    }
   }, [ensureFrame]);
+
+  const drawBestAvailableFrame = useCallback((index) => {
+    const primary = ensureFrame(index, true);
+    if (primary && primary.complete) {
+      drawImageToCanvas(primary);
+      return;
+    }
+
+    for (let offset = 1; offset <= MAX_FALLBACK_DISTANCE; offset++) {
+      const before = framesRef.current.get(index - offset);
+      if (before && before.complete) {
+        drawImageToCanvas(before);
+        return;
+      }
+      const after = framesRef.current.get(index + offset);
+      if (after && after.complete) {
+        drawImageToCanvas(after);
+        return;
+      }
+    }
+  }, [drawImageToCanvas, ensureFrame]);
+
+  const scheduleDraw = useCallback(() => {
+    if (rafRef.current != null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      drawBestAvailableFrame(currentFrameRef.current);
+    });
+  }, [drawBestAvailableFrame]);
 
   const resize = useCallback(() => {
     const canvas = canvasRef.current;
@@ -120,13 +151,10 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
 
     if (frameIndex !== currentFrameRef.current) {
       currentFrameRef.current = frameIndex;
-      for (let i = 1; i <= PRELOAD_AHEAD; i++) {
-        ensureFrame(frameIndex + i);
-      }
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => drawFrame(frameIndex));
+      prefetchNearbyFrames(frameIndex);
+      scheduleDraw();
     }
-  }, [drawFrame, ensureFrame]);
+  }, [prefetchNearbyFrames, scheduleDraw]);
 
   useEffect(() => {
     const staticFrame = Number.isFinite(STATIC_FRAME_INDEX)
@@ -137,9 +165,7 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
 
     ensureFrame(currentFrameRef.current, true);
     if (!SINGLE_IMAGE_MODE) {
-      for (let i = 1; i <= PRELOAD_AHEAD; i++) {
-        ensureFrame(i);
-      }
+      prefetchNearbyFrames(currentFrameRef.current);
     }
 
     resize();
@@ -184,7 +210,7 @@ const ScrollFrameBackground = ({ startSelector = '#who-we-work-with', endSelecto
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       framesRef.current.clear();
     };
-  }, [onScroll, resize, updateBounds, drawFrame, ensureFrame]);
+  }, [onScroll, resize, updateBounds, drawFrame, ensureFrame, prefetchNearbyFrames]);
 
   return (
     <div
