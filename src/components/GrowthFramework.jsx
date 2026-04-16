@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Search, Lightbulb, Rocket, LineChart, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import TextAnimation from './ui/scroll-text';
@@ -14,6 +14,52 @@ const rowVariants = {
 };
 
 const GrowthFramework = () => {
+  const vantaRef = useRef(null);
+  const vantaEffectRef = useRef(null);
+
+  useEffect(() => {
+    const shouldEnable = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!shouldEnable || !vantaRef.current) return;
+
+    let cancelled = false;
+
+    const initVanta = async () => {
+      const [{ default: CELLS }, THREE] = await Promise.all([
+        import('vanta/dist/vanta.cells.min'),
+        import('three'),
+      ]);
+
+      if (cancelled || !vantaRef.current) return;
+
+      vantaEffectRef.current = CELLS({
+        el: vantaRef.current,
+        THREE,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200,
+        minWidth: 200,
+        scale: 1,
+        scaleMobile: 1,
+        backgroundColor: 0x070b14,
+        color1: 0x22d3ee,
+        color2: 0x0ea5e9,
+        size: 1.15,
+        speed: 1.2,
+      });
+    };
+
+    initVanta();
+
+    return () => {
+      cancelled = true;
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+      }
+    };
+  }, []);
+
   const steps = [
     { number: '01', icon: Search, title: 'Deep Discovery', description: "Comprehensive audit of your current marketing, competitive landscape, and growth opportunities. We identify what's working, what's broken, and where the biggest wins hide." },
     { number: '02', icon: Lightbulb, title: 'AI Strategy Blueprint', description: 'Custom growth strategy combining AI automation, performance channels, and creative angles. We map out the exact path from your current state to your revenue goals.' },
@@ -23,8 +69,11 @@ const GrowthFramework = () => {
   ];
 
   return (
-    <section id="process" className="py-24 bg-[var(--bg-secondary)]">
-      <div className="container mx-auto px-6">
+    <section id="process" className="relative py-24 bg-[var(--bg-secondary)] overflow-hidden">
+      <div ref={vantaRef} className="absolute inset-0 z-0 pointer-events-none" />
+      <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_bottom,rgba(7,11,20,0.42)_0%,rgba(7,11,20,0.3)_45%,rgba(7,11,20,0.42)_100%)] pointer-events-none" />
+
+      <div className="container mx-auto px-6 relative z-[2]">
         <div className="text-center mb-16">
           <TextAnimation as="h2" classname="display-md text-[var(--text-primary)] mb-4" direction="up">
             Our <span className="text-[var(--accent-primary)]">Growth Framework</span>
@@ -45,7 +94,7 @@ const GrowthFramework = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: '-10%' }}
-                className="bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-2xl p-8 hover:border-[var(--accent-primary)] transition-all group relative overflow-hidden"
+                className="bg-[rgb(10,14,24)]/72 backdrop-blur-sm border border-[var(--border-subtle)] rounded-2xl p-8 hover:border-[var(--accent-primary)] transition-all group relative overflow-hidden"
               >
                 <div className="absolute right-8 top-1/2 -translate-y-1/2 text-[120px] font-bold text-[var(--bg-tertiary)] group-hover:text-[rgba(18,216,250,0.08)] transition-colors select-none">
                   {step.number}

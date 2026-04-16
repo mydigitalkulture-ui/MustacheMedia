@@ -1,50 +1,68 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ArrowRight, Calendar, TrendingUp, BarChart, Network } from 'lucide-react';
 
-const Cubes = lazy(() => import('./Cubes'));
-
 const HeroSection = () => {
-  const [showHeroCubes, setShowHeroCubes] = useState(false);
+  const vantaRef = useRef(null);
+  const vantaEffectRef = useRef(null);
 
   useEffect(() => {
     const shouldEnable =
-      window.matchMedia('(min-width: 1024px)').matches &&
       !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (!shouldEnable) return;
+    if (!shouldEnable || !vantaRef.current) return;
 
-    const timerId = window.setTimeout(() => {
-      setShowHeroCubes(true);
-    }, 450);
+    let cancelled = false;
+
+    const initVanta = async () => {
+      const [{ default: GLOBE }, THREE] = await Promise.all([
+        import('vanta/dist/vanta.globe.min'),
+        import('three'),
+      ]);
+
+      if (cancelled || !vantaRef.current) return;
+
+      vantaEffectRef.current = GLOBE({
+        el: vantaRef.current,
+        THREE,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200,
+        minWidth: 200,
+        scale: 1,
+        scaleMobile: 1,
+        backgroundColor: 0x0b1020,
+        color: 0x12d8fa,
+        color2: 0x7dd3fc,
+      });
+    };
+
+    initVanta();
 
     return () => {
-      window.clearTimeout(timerId);
+      cancelled = true;
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+      }
     };
   }, []);
 
   const handlePrimaryCTA = () => {
-    const strategySection = document.getElementById('strategy');
-    if (strategySection) {
-      strategySection.scrollIntoView({ behavior: 'smooth' });
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      const headerOffset = 96;
+      const targetY = contactSection.getBoundingClientRect().top + window.scrollY - headerOffset;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
     }
   };
 
   return (
     <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[var(--bg-primary)] pt-32 pb-20">
+      <div ref={vantaRef} className="absolute inset-0 z-0" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[var(--bg-primary)]/75 via-[var(--bg-primary)]/60 to-[var(--bg-primary)]/80" />
 
-      {showHeroCubes ? (
-        <Suspense fallback={null}>
-          <Cubes
-            fullScreen={true}
-            gridSize={12}
-            rippleColor="rgba(18, 216, 250, 0.3)"
-            faceColor="rgba(12, 19, 38, 0.4)"
-            borderStyle="1px solid rgba(18, 216, 250, 0.15)"
-          />
-        </Suspense>
-      ) : null}
-
-      <div className="container mx-auto px-6 relative z-10 flex flex-col items-center text-center mt-10">
+      <div className="container mx-auto px-6 relative z-[2] flex flex-col items-center text-center mt-10">
 
         {/* Industry Pill */}
         <div className="inline-flex items-center space-x-2 bg-transparent border border-[var(--accent-primary)] rounded-full px-4 py-1.5 mb-8 animate-fade-in shadow-[0_0_15px_rgba(18,216,250,0.1)]">

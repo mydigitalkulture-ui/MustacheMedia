@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import { Toaster } from "./components/ui/sonner";
 
 const CustomCursor = lazy(() => import("./components/CustomCursor"));
-const CanvasCursor = lazy(() => import("./components/ui/canvas-cursor"));
 
 function App() {
   const [enableEnhancedEffects, setEnableEnhancedEffects] = useState(false);
@@ -33,7 +32,6 @@ function App() {
       {enableEnhancedEffects ? (
         <Suspense fallback={null}>
           <CustomCursor />
-          <CanvasCursor />
         </Suspense>
       ) : null}
       <Toaster />

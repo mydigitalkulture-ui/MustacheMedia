@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Brain, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import TextAnimation from './ui/scroll-text';
@@ -14,6 +14,49 @@ const cardVariants = {
 };
 
 const AIAdvantage = () => {
+  const vantaRef = useRef(null);
+  const vantaEffectRef = useRef(null);
+
+  useEffect(() => {
+    const shouldEnable = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!shouldEnable || !vantaRef.current) return;
+
+    let cancelled = false;
+
+    const initVanta = async () => {
+      const [{ default: RINGS }, THREE] = await Promise.all([
+        import('vanta/dist/vanta.rings.min'),
+        import('three'),
+      ]);
+
+      if (cancelled || !vantaRef.current) return;
+
+      vantaEffectRef.current = RINGS({
+        el: vantaRef.current,
+        THREE,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200,
+        minWidth: 200,
+        scale: 1,
+        scaleMobile: 1,
+        backgroundColor: 0x060b16,
+        color: 0x12d8fa,
+      });
+    };
+
+    initVanta();
+
+    return () => {
+      cancelled = true;
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+      }
+    };
+  }, []);
+
   const advantages = [
     { icon: Brain, title: 'Intelligent Optimization', description: 'Our AI models analyze millions of data points in real-time, continuously optimizing your campaigns for peak performance. What used to take weeks now happens in minutes.', stats: '10x Faster Optimization' },
     { icon: Zap, title: 'Predictive Scaling', description: 'Machine learning algorithms predict market trends and customer behavior before they happen. Scale winners fast, kill losers instantly, maximize every ad dollar.', stats: '40% Lower CAC' },
@@ -21,10 +64,12 @@ const AIAdvantage = () => {
   ];
 
   return (
-    <section id="ai-advantage" className="py-24 bg-[var(--bg-primary)]">
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[rgba(18,216,250,0.04)] to-transparent"></div>
+    <section id="ai-advantage" className="relative py-24 bg-[var(--bg-primary)] overflow-hidden">
+      <div ref={vantaRef} className="absolute inset-0 z-0" />
+      <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_bottom,rgba(6,11,22,0.78)_0%,rgba(6,11,22,0.58)_45%,rgba(6,11,22,0.78)_100%)]" />
+      <div className="absolute top-0 right-0 w-1/2 h-full z-[1] bg-gradient-to-l from-[rgba(18,216,250,0.08)] to-transparent" />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-[2]">
         <div className="text-center mb-16">
           <TextAnimation as="h2" classname="display-md text-[var(--text-primary)] mb-4" direction="up">
             The <span className="text-[var(--accent-primary)]">AI Advantage</span>

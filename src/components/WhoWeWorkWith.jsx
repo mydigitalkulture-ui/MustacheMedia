@@ -2,6 +2,7 @@ import React from 'react';
 import { Zap, ShoppingCart, TrendingUp, Smartphone, Globe, Rocket } from 'lucide-react';
 import { motion } from 'framer-motion';
 import TextAnimation from './ui/scroll-text';
+import './WhoWeWorkWithPattern.css';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 40, filter: 'blur(8px)' },
@@ -24,8 +25,12 @@ const WhoWeWorkWith = () => {
   ];
 
   return (
-    <section className="py-24 bg-[var(--bg-primary)]">
-      <div className="container mx-auto px-6">
+    <section className="who-work-with-section py-24 bg-[var(--bg-primary)]">
+      <div className="who-work-pattern">
+        <div className="container" />
+      </div>
+      <div className="who-work-pattern-overlay" />
+      <div className="who-work-content container mx-auto px-6">
         <div className="text-center mb-16">
           <TextAnimation as="h2" classname="display-md text-[var(--text-primary)] mb-4" direction="up">
             Who We <span className="text-[var(--accent-primary)]">Work With</span>

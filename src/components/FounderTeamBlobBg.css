@@ -1,0 +1,71 @@
+@keyframes founder-blob-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.founder-team-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.founder-team-blob-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #fee440;
+}
+
+.founder-team-blob-bg svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.founder-blob-out-top {
+  animation: founder-blob-rotate 20s linear infinite;
+  transform-origin: 13px 25px;
+}
+
+.founder-blob-in-top {
+  animation: founder-blob-rotate 10s linear infinite;
+  transform-origin: 13px 25px;
+}
+
+.founder-blob-out-bottom {
+  animation: founder-blob-rotate 25s linear infinite;
+  transform-origin: 84px 93px;
+}
+
+.founder-blob-in-bottom {
+  animation: founder-blob-rotate 15s linear infinite;
+  transform-origin: 84px 93px;
+}
+
+.founder-team-blob-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(17, 17, 19, 0.78), rgba(17, 17, 19, 0.58) 45%, rgba(17, 17, 19, 0.8));
+}
+
+.founder-team-content {
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .founder-blob-out-top,
+  .founder-blob-in-top,
+  .founder-blob-out-bottom,
+  .founder-blob-in-bottom {
+    animation: none;
+  }
+}

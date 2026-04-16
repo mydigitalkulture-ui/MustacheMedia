@@ -1,9 +1,55 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Bot, Target, ShoppingBag, Share2, Video, BarChart3 } from 'lucide-react';
 import TextAnimation from './ui/scroll-text';
 import { motion } from 'framer-motion';
 
 const Services = () => {
+  const vantaRef = useRef(null);
+  const vantaEffectRef = useRef(null);
+
+  useEffect(() => {
+    const shouldEnable = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!shouldEnable || !vantaRef.current) return;
+
+    let cancelled = false;
+
+    const initVanta = async () => {
+      const [{ default: FOG }, THREE] = await Promise.all([
+        import('vanta/dist/vanta.fog.min'),
+        import('three'),
+      ]);
+
+      if (cancelled || !vantaRef.current) return;
+
+      vantaEffectRef.current = FOG({
+        el: vantaRef.current,
+        THREE,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200,
+        minWidth: 200,
+        highlightColor: 0x12d8fa,
+        midtoneColor: 0x0f2f49,
+        lowlightColor: 0x0b1020,
+        baseColor: 0x070b14,
+        blurFactor: 0.6,
+        speed: 1.4,
+        zoom: 1.1,
+      });
+    };
+
+    initVanta();
+
+    return () => {
+      cancelled = true;
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+      }
+    };
+  }, []);
+
   const services = [
     {
       icon: Bot,
@@ -50,9 +96,11 @@ const Services = () => {
   ];
 
   return (
-    <section id="services" className="py-24 bg-[var(--bg-primary)]">
+    <section id="services" className="relative py-24 bg-[var(--bg-primary)] overflow-hidden">
+      <div ref={vantaRef} className="absolute inset-0 z-0" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[rgb(10,13,20)]/80 via-[rgb(10,13,20)]/65 to-[rgb(10,13,20)]/85" />
 
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 relative z-[2]">
         <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
