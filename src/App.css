@@ -248,6 +248,21 @@ body {
   }
 }
 
+@media (max-width: 480px) {
+  .display-lg {
+    font-size: 30px;
+    line-height: 1.05;
+  }
+
+  .display-md {
+    font-size: 28px;
+  }
+
+  .body-lg {
+    font-size: 16px;
+  }
+}
+
 /* Container */
 .container {
   max-width: 1200px;
@@ -259,4 +274,4 @@ body {
   .container {
     padding: 0 16px;
   }
-}
+  }

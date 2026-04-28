@@ -58,11 +58,11 @@ const HeroSection = () => {
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[var(--bg-primary)] pt-32 pb-20">
+    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[var(--bg-primary)] pt-24 pb-16 sm:pt-32 sm:pb-20">
       <div ref={vantaRef} className="absolute inset-0 z-0" />
       <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[var(--bg-primary)]/75 via-[var(--bg-primary)]/60 to-[var(--bg-primary)]/80" />
 
-      <div className="container mx-auto px-6 relative z-[2] flex flex-col items-center text-center mt-10">
+      <div className="container mx-auto px-6 relative z-[2] flex flex-col items-center text-center mt-6 sm:mt-10">
 
         {/* Industry Pill */}
         <div className="inline-flex items-center space-x-2 bg-transparent border border-[var(--accent-primary)] rounded-full px-4 py-1.5 mb-8 animate-fade-in shadow-[0_0_15px_rgba(18,216,250,0.1)]">
@@ -72,19 +72,19 @@ const HeroSection = () => {
         </div>
 
         {/* Headline */}
-        <h1 className="display-lg text-[var(--text-primary)] max-w-4xl mx-auto mb-6 animate-fade-in leading-[1.1]">
+        <h1 className="display-lg text-[var(--text-primary)] max-w-3xl md:max-w-4xl mx-auto mb-6 animate-fade-in leading-[1.1]">
           Mustache Media: <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-blue)] via-[var(--accent-primary)] to-[var(--accent-green)] font-bold">[AI-First Marketing]</span><br />
           That Drives Revenue
         </h1>
 
         {/* Subheadline */}
-        <p className="body-lg text-[var(--text-secondary)] max-w-2xl mx-auto mb-12 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <p className="body-lg text-[var(--text-secondary)] max-w-2xl mx-auto mb-10 sm:mb-12 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           Founder-led agency combining cutting-edge AI automation with performance marketing
           expertise to scale brands profitably across Meta, Google, and emerging platforms.
         </p>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in mb-24" style={{ animationDelay: '0.2s' }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in mb-16 sm:mb-24" style={{ animationDelay: '0.2s' }}>
           <button
             onClick={handlePrimaryCTA}
             className="group flex items-center justify-center space-x-2 px-8 py-3.5 rounded-full text-[var(--bg-primary)] font-semibold transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(18,216,250,0.4)] bg-gradient-to-r from-[var(--accent-blue)] via-[var(--accent-primary)] to-[var(--accent-green)] border border-transparent hover:border-white"
@@ -108,7 +108,7 @@ const HeroSection = () => {
               <BarChart size={24} className="text-[var(--accent-green)]" />
             </div>
             <div className="text-left">
-              <h3 className="text-3xl font-bold text-[var(--text-primary)]">$50M+</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">$50M+</h3>
               <p className="text-sm text-[var(--text-secondary)]">Ad Spend Managed</p>
             </div>
           </div>
@@ -119,7 +119,7 @@ const HeroSection = () => {
               <TrendingUp size={24} className="text-[var(--accent-cyan)]" />
             </div>
             <div className="text-left">
-              <h3 className="text-3xl font-bold text-[var(--text-primary)]">300%</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">300%</h3>
               <p className="text-sm text-[var(--text-secondary)]">Avg ROAS Increase</p>
             </div>
           </div>
@@ -130,7 +130,7 @@ const HeroSection = () => {
               <Network size={24} className="text-[var(--accent-blue)]" />
             </div>
             <div className="text-left">
-              <h3 className="text-3xl font-bold text-[var(--text-primary)]">50+</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">50+</h3>
               <p className="text-sm text-[var(--text-secondary)]">Brands Scaled</p>
             </div>
           </div>
